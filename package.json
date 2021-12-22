@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx @11ty/eleventy",
+    "watch": "npx @11ty/eleventy --watch",
+    "serve": "npx @11ty/eleventy --serve",
+    "start": "npx @11ty/eleventy --start"
   },
   "repository": {
     "type": "git",
@@ -17,7 +20,7 @@
     "url": "https://github.com/25thhour/jwdn.cc/issues"
   },
   "homepage": "https://github.com/25thhour/jwdn.cc#readme",
-  "dependencies": {
+  "devDependencies": {
     "@11ty/eleventy": "^1.0.0-beta.8"
   }
 }
