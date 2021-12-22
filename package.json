@@ -7,7 +7,8 @@
     "build": "npx @11ty/eleventy",
     "watch": "npx @11ty/eleventy --watch",
     "serve": "npx @11ty/eleventy --serve",
-    "start": "npx @11ty/eleventy --start"
+    "start": "npx @11ty/eleventy --start",
+    "format": "prettier --write '**/*.{js,css,html,md}'"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,7 @@
   },
   "homepage": "https://github.com/25thhour/jwdn.cc#readme",
   "devDependencies": {
-    "@11ty/eleventy": "^1.0.0-beta.8"
+    "@11ty/eleventy": "^1.0.0-beta.8",
+    "prettier": "^2.5.1"
   }
 }
