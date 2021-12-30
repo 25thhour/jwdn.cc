@@ -5,6 +5,7 @@ Personal short url collection…may evolve into a full blown short url service a
 ## Examples
 
 - [jwdn.cc/dot](https://github.com/25thhour/dotfiles) links to my dotfiles repo.
+- [jwdn.cc/tw](https://twitter.com/25thhour) links to my Twitter profile.
 
 ---
 
