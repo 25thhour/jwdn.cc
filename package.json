@@ -7,7 +7,7 @@
     "build": "npx @11ty/eleventy",
     "watch": "npx @11ty/eleventy --watch",
     "serve": "npx @11ty/eleventy --serve",
-    "start": "npx @11ty/eleventy --start",
+    "start": "npx @11ty/eleventy --serve",
     "format": "prettier --write '**/*.{js,css,html,md}'"
   },
   "repository": {
