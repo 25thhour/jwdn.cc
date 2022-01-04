@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "ELEVENTY_ENV=production npx @11ty/eleventy & NODE_ENV=production npx tailwindcss -i ./src/input.css -o ./_site/output.css --minify",
-    "watch": "npx @11ty/eleventy --watch & npx tailwindcss -i ./src/input.css -o ./_site/output.css --watch",
-    "serve": "npx @11ty/eleventy --serve & npx tailwindcss -i ./src/input.css -o ./_site/output.css --watch",
-    "start": "npx @11ty/eleventy --serve & npx tailwindcss -i ./src/input.css -o ./_site/output.css --watch",
-    "format": "prettier --write '**/*.{js,css,html,md}'"
+    "clean": "del _site",
+    "build:css": "NODE_ENV=production npx tailwindcss -i ./src/input.css -o ./_site/output.css --minify",
+    "build:11ty": "ELEVENTY_ENV=production npx @11ty/eleventy",
+    "dev:css": "npx tailwindcss -i ./src/input.css -o ./_site/output.css --watch",
+    "dev:start": "npx @11ty/eleventy --serve",
+    "format": "prettier --write '**/*.{js,css,html,md}'",
+    "start": "run-p dev:*",
+    "build": "run-s clean build:*"
   },
   "repository": {
     "type": "git",
@@ -23,6 +26,8 @@
   "homepage": "https://github.com/25thhour/jwdn.cc#readme",
   "devDependencies": {
     "@11ty/eleventy": "^1.0.0-beta.9",
+    "del-cli": "^4.0.1",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.5.1",
     "tailwindcss": "^3.0.9"
   }
