@@ -11,7 +11,7 @@
     "dev:start": "npx @11ty/eleventy --serve",
     "format": "prettier --write '**/*.{js,css,html,md}'",
     "start": "run-p dev:*",
-    "build": "run-s clean build:*"
+    "build": "run-s build:*"
   },
   "repository": {
     "type": "git",
