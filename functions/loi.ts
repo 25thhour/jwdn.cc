@@ -36,11 +36,11 @@ export async function onRequest(ctx) {
     // Must use Response constructor to inherit all of response's fields
     response = new Response(JSON.stringify(locations, null, 2), response)
 
-    // Cache API respects Cache-Control headers. Setting s-max-age to 1800
-    // will limit the response to be in cache for 1800 seconds max
+    // Cache API respects Cache-Control headers. Setting s-max-age to 900
+    // will limit the response to be in cache for 900 seconds max
 
     // Any changes made to the response here will be reflected in the cached value
-    response.headers.append("Cache-Control", "s-maxage=1800")
+    response.headers.append("Cache-Control", "s-maxage=900")
     response.headers.set("Content-Type", "application/json")
 
     // Store the fetched response as cacheKey
