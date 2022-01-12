@@ -33,17 +33,39 @@ export async function onRequest(ctx) {
     const updated = new Date().toLocaleString('en-NZ', { hour12: false, timeZone: 'Pacific/Auckland' })
     const timestamp = new Date().toISOString()
     const { locations } = await getLocationData(city)
+    const dateOptions = { hour12: false, timeZone: 'Pacific/Auckland' }
+    const markup  = `
+      <ol class="locations">
+        ${locations.map(location => {
+          const warning = /close/i.test(location.exposureType)
+          const startTime = new Date(location.startTime).toLocaleString('en-NZ', {...dateOptions, dateStyle: 'full', timeStyle: 'short'})
+          const endTime = new Date(location.endTime).toLocaleTimeString('en-NZ', {...dateOptions, timeStyle: 'short'})
+
+          return `
+            <li>
+                <p>
+                  <b>${location.name}</b><br>
+                  ${startTime} – ${endTime}<br>
+                  ${location.address}
+                </p>
+                <p style="${warning ? `color: red;` : ''}">
+                  ${warning ? `⚠️ ${location.todo}` : `${location.todo}`}
+                </p>
+            </li>
+          `}).join('')}
+      </ol>
+    `
 
     console.log(locations)
     // Must use Response constructor to inherit all of response's fields
-    response = new Response(JSON.stringify({ updated, timestamp, locations }, null, 2), response)
+    response = new Response(markup, response)
 
     // Cache API respects Cache-Control headers. Setting s-max-age to 900
     // will limit the response to be in cache for 900 seconds max
 
     // Any changes made to the response here will be reflected in the cached value
     response.headers.append("Cache-Control", "s-maxage=900")
-    response.headers.set("Content-Type", "application/json")
+    response.headers.set("Content-Type", "text/html; charset=UTF-8")
 
     // Store the fetched response as cacheKey
     // Use waitUntil so you can return the response without blocking on
