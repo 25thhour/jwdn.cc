@@ -41,6 +41,7 @@ export async function onRequest(ctx) {
 
     // Any changes made to the response here will be reflected in the cached value
     response.headers.append("Cache-Control", "s-maxage=1800")
+    response.headers.set("Content-Type", "application/json")
 
     // Store the fetched response as cacheKey
     // Use waitUntil so you can return the response without blocking on
