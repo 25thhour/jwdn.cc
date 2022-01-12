@@ -30,12 +30,13 @@ export async function onRequest(ctx) {
 
   if (!response) {
     // If not in cache, get it from origin
-    const timestamp = new Date().toLocaleString()
+    const updated = new Date().toLocaleString('en-NZ', { hour12: false, timeZone: 'Pacific/Auckland' })
+    const timestamp = new Date().toISOString()
     const { locations } = await getLocationData(city)
 
     console.log(locations)
     // Must use Response constructor to inherit all of response's fields
-    response = new Response(JSON.stringify({ updated: timestamp, locations }, null, 2), response)
+    response = new Response(JSON.stringify({ updated, timestamp, locations }, null, 2), response)
 
     // Cache API respects Cache-Control headers. Setting s-max-age to 900
     // will limit the response to be in cache for 900 seconds max
