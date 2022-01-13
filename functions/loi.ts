@@ -16,7 +16,7 @@ export async function onRequest(ctx) {
   const event = ctx.event
   const request = ctx.request
   const cacheUrl = new URL(request.url)
-  const city = cacheUrl.searchParams.get('city') || ''
+  const city = cacheUrl.searchParams.get('city') || 'Christchurch'
   console.log(city)
 
   // Construct the cache key from the cache URL
@@ -35,25 +35,36 @@ export async function onRequest(ctx) {
     const { locations } = await getLocationData(city)
     const dateOptions = { hour12: false, timeZone: 'Pacific/Auckland' }
     const markup  = `
-      <ol class="locations">
-        ${locations.map(location => {
-          const warning = /close/i.test(location.exposureType)
-          const startTime = new Date(location.startTime).toLocaleString('en-NZ', {...dateOptions, dateStyle: 'full', timeStyle: 'short'})
-          const endTime = new Date(location.endTime).toLocaleTimeString('en-NZ', {...dateOptions, timeStyle: 'short'})
+    <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://unpkg.com/normalize.css@8.0.1/normalize.css">
+        <title>NZ Locations of Interest | ${city}</title>
+      </head>
+      <body>
+        <ol class="locations">
+          ${locations.map(location => {
+            const warning = /close/i.test(location.exposureType)
+            const startDate = new Date(location.startTime).toLocaleString('en-NZ', {...dateOptions, dateStyle: 'full'})
+            const startTime = new Date(location.startTime).toLocaleString('en-NZ', {...dateOptions, timeStyle: 'short'})
+            const endTime = new Date(location.endTime).toLocaleTimeString('en-NZ', {...dateOptions, timeStyle: 'short'})
 
-          return `
-            <li>
-                <p>
-                  <b>${location.name}</b><br>
-                  ${startTime} – ${endTime}<br>
-                  ${location.address}
-                </p>
-                <p style="${warning ? `color: red;` : ''}">
-                  ${warning ? `⚠️ ${location.todo}` : `${location.todo}`}
-                </p>
-            </li>
-          `}).join('')}
-      </ol>
+            return `
+              <li>
+                  <h2>${location.name}</h2>
+                  <h3>📆 ${startDate}</h3>
+                  <h3>⌚ ${startTime} – ${endTime}</h3>
+                  <p>📍 ${location.address}</p>
+                  <p style="${warning ? `color: red;` : ''}">
+                    ${warning ? `⚠️ ${location.todo}` : `${location.todo}`}
+                  </p>
+              </li>
+            `}).join('')}
+        </ol>
+        </body>
+      </html>
     `
 
     console.log(locations)
@@ -64,7 +75,7 @@ export async function onRequest(ctx) {
     // will limit the response to be in cache for 900 seconds max
 
     // Any changes made to the response here will be reflected in the cached value
-    response.headers.append("Cache-Control", "s-maxage=900")
+    response.headers.append("Cache-Control", "max-age=300, s-maxage=900")
     response.headers.set("Content-Type", "text/html; charset=UTF-8")
 
     // Store the fetched response as cacheKey
