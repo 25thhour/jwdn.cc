@@ -13,7 +13,7 @@ Personal short url collection…may evolve into a full blown short url service a
 
 Cloudflare Workers live in the `./functions` directory and are set to be ignored by 11ty in the `.eleventyignore` file.
 
-To test a function run `wrangler pages dev functions`.
+To test a function run `npx wrangler pages dev functions`.
 
 ---
 
