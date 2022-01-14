@@ -2,7 +2,7 @@
 
 async function getLocationData(city?: string) {
   const location = city || 'Christchurch'
-  const url = `https://locations.covid19.health.nz/api/loi?search=&sort=updated&order=DESC&city=${location}&suburb=All`
+  const url = `https://locations.covid19.health.nz/api/loi?search=&sort=expose%20time&order=DESC&city=${location}&suburb=All`
   const response = await fetch(url, {
     headers: {
       'content-type': 'application/json'
