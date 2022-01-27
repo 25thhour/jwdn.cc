@@ -32,7 +32,10 @@ export async function onRequest(ctx) {
     // If not in cache, get it from origin
     const updated = new Date().toLocaleString('en-NZ', { hour12: false, timeZone: 'Pacific/Auckland' })
     const timestamp = new Date().toISOString()
-    const { locations } = await getLocationData(city)
+    const { locations, extraInfo } = await getLocationData(city)
+    const cityList = extraInfo.cityList
+    console.log(cityList)
+    const hasLocations = locations.length
     const dateOptions = { hour12: false, timeZone: 'Pacific/Auckland' }
     const markup  = `
     <!DOCTYPE html>
@@ -40,13 +43,28 @@ export async function onRequest(ctx) {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://unpkg.com/normalize.css@8.0.1/normalize.css">
         <title>NZ Locations of Interest | ${city}</title>
+        <style>
+          body { color: #333; font-family: sans-serif; }
+          main { display: grid; height: 100vh; text-align: center; }
+          h2 { margin-bottom: 0.5em; }
+          h3, h4 { margin: 0.5em 0; }
+          p { margin: 1em 0;}
+        </style>
       </head>
       <body>
+        <select id="cities" onchange="javascript:location.href=this.value;">
+          <option value="">Change City</option>
+          ${cityList.map(c => {
+            return `<option value="?c=${c}" ${(c === city) ? `selected` : '' }>${c}</option>`
+            }).join('')
+          }
+        </select>
+      ${(hasLocations) ? `
         <ol class="locations">
           ${locations.map(location => {
-            const warning = /close/i.test(location.exposureType)
+            const warning = /close/i.test(location.exposureType) || /omicron/i.test(location.todo)
+            const omicron = /omicron/i.test(location.todo)
             const startDate = new Date(location.startTime).toLocaleString('en-NZ', {...dateOptions, dateStyle: 'full'})
             const startTime = new Date(location.startTime).toLocaleString('en-NZ', {...dateOptions, timeStyle: 'short'})
             const endTime = new Date(location.endTime).toLocaleTimeString('en-NZ', {...dateOptions, timeStyle: 'short'})
@@ -57,12 +75,30 @@ export async function onRequest(ctx) {
                   <h3>📆 ${startDate}</h3>
                   <h3>⌚ ${startTime} – ${endTime}</h3>
                   <p>📍 ${location.address}</p>
+                  <p style="${warning ? `color: red; text-transform: uppercase;` : ''}">
+                    ${omicron ? '☣️  Omicron ☣️' : ''}
+                  </p>
                   <p style="${warning ? `color: red;` : ''}">
                     ${warning ? `⚠️ ${location.todo}` : `${location.todo}`}
                   </p>
               </li>
             `}).join('')}
-        </ol>
+        </ol>`
+        :
+        `
+        <main>
+          <h1 style='font-size: 5rem; margin:auto;'>
+            <span style='color: #00ad00;'>ALL CLEAR</span>
+            <br>
+            …
+            <br>
+            for now
+            <br>
+            <span style='font-size: 10rem;'>😷</span>
+          </h1>
+        `
+      }
+        </main>
         </body>
       </html>
     `
