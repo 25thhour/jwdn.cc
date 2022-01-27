@@ -56,7 +56,7 @@ export async function onRequest(ctx) {
         <select id="cities" onchange="javascript:location.href=this.value;">
           <option value="">Change City</option>
           ${cityList.map(c => {
-            return `<option value="?c=${c}" ${(c === city) ? `selected` : '' }>${c}</option>`
+            return `<option value="?city=${c}" ${(c === city) ? `selected` : '' }>${c}</option>`
             }).join('')
           }
         </select>
