@@ -1,6 +1,33 @@
-// const validCities = ['Auckland', 'Bay of Islands', 'Bulls', 'Carterton', 'Christchurch', 'Feilding', 'Hamilton', 'Lower Hutt', 'Manawatu-Wanganui', 'Masterton', 'Mount Maunganui', 'New Plymouth', 'Opotiki', 'Orewa', 'Otaki', 'Otorohanga', 'Palmerston North', 'Papamoa', 'Queenstown', 'Rotorua', 'Takanini', 'Taupō', 'Tauranga', 'Waihi', 'Waihi Beach', 'Waimauku', 'Warkworth', 'Wellington']
+interface LocationData {
+  locations: Location[]
+  extraInfo: ExtraInfo
+}
 
-async function getLocationData(city?: string) {
+type Location = {
+  name: string
+  address: string
+  startTime: string
+  endTime: string
+  todo: string
+  publishedAt: string
+  updatedAt: string
+  latitude: string
+  longitude: string
+  city: string
+  suburb: string
+  showHealthlineLinks: boolean
+  eventId: string
+  exposureType: string
+}
+
+type ExtraInfo = {
+  total: number
+  filtered: number
+  cityList: string[]
+  suburbList: string[]
+}
+
+async function getLocationData(city?: string):Promise<LocationData> {
   const location = city || 'Christchurch'
   const url = `https://locations.covid19.health.nz/api/loi?search=&sort=expose%20time&order=DESC&city=${location}&suburb=All`
   const response = await fetch(url, {
@@ -13,11 +40,14 @@ async function getLocationData(city?: string) {
 }
 
 export async function onRequest(ctx) {
-  const event = ctx.event
   const request = ctx.request
   const cacheUrl = new URL(request.url)
+  const DEBUG = cacheUrl.searchParams.get('debug') === 'true' ? true : false
+  console.log(`DEBUG: ${DEBUG}`)
   const city = cacheUrl.searchParams.get('city') || 'Christchurch'
-  console.log(city)
+  const { timezone } = request.cf
+
+  console.log(`City: ${city}, Timezone: ${timezone}`)
 
   // Construct the cache key from the cache URL
   const cacheKey = new Request(cacheUrl.toString(), request)
@@ -28,13 +58,12 @@ export async function onRequest(ctx) {
   // for future access
   let response = await cache.match(cacheKey)
 
-  if (!response) {
+  if (!response || DEBUG) {
     // If not in cache, get it from origin
-    const updated = new Date().toLocaleString('en-NZ', { hour12: false, timeZone: 'Pacific/Auckland' })
-    const timestamp = new Date().toISOString()
+    const updated = new Date().toLocaleString('en-NZ', { hour12: false, timeZone: `${timezone}` })
     const { locations, extraInfo } = await getLocationData(city)
     const cityList = extraInfo.cityList
-    console.log(cityList)
+    // console.log(cityList)
     const hasLocations = locations.length
     const dateOptions = { hour12: false, timeZone: 'Pacific/Auckland' }
     const markup  = `
@@ -53,6 +82,7 @@ export async function onRequest(ctx) {
         </style>
       </head>
       <body>
+      <p>Last updated: ${updated}</p>
         <select id="cities" onchange="javascript:location.href=this.value;">
           <option value="">Change City</option>
           ${cityList.map(c => {
@@ -103,15 +133,17 @@ export async function onRequest(ctx) {
       </html>
     `
 
-    console.log(locations)
+    // console.log(locations)
     // Must use Response constructor to inherit all of response's fields
     response = new Response(markup, response)
 
     // Cache API respects Cache-Control headers. Setting s-max-age to 900
     // will limit the response to be in cache for 900 seconds max
 
-    // Any changes made to the response here will be reflected in the cached value
-    response.headers.append("Cache-Control", "max-age=300, s-maxage=900")
+    if (!DEBUG) {
+      // Any changes made to the response here will be reflected in the cached value
+      response.headers.append("Cache-Control", "max-age=300, s-maxage=900")
+    }
     response.headers.set("Content-Type", "text/html; charset=UTF-8")
 
     // Store the fetched response as cacheKey
