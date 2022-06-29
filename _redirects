@@ -5,6 +5,7 @@
 /gh/*       https://github.com/25thhour/:splat
 /gi/*       https://raw.githubusercontent.com/github/gitignore/main/:splat.gitignore
 /me         https://jwdeane.com/
+/regex      https://regex101.com/
 /snip       https://github.com/25thhour/11ty-vscode-snippet-generator
 /terra      https://github.com/25thhour/cf-terraform-template
 /til        https://jwdeane.com/til/
