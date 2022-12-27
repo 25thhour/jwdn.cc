@@ -22,9 +22,9 @@
   },
   "homepage": "https://github.com/25thhour/jwdn.cc#readme",
   "devDependencies": {
-    "@11ty/eleventy": "^1.0.0-beta.8",
-    "@cloudflare/workers-types": "^3.3.0",
-    "prettier": "^2.5.1",
-    "wrangler": "^0.0.7"
+    "@11ty/eleventy": "^1.0.2",
+    "@cloudflare/workers-types": "^3.18.0",
+    "prettier": "^2.8.1",
+    "wrangler": "^2.6.2"
   }
 }
